@@ -1,14 +1,60 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Exploring Activity Monitor Data"
 output: 
   html_document:
     keep_md: true
 ---
 
 
+
 ## Loading and preprocessing the data
 
+If you don't have the data, you can find it [here](https://github.com/mattayes/RepData_PeerAssessment1/blob/master/activity.zip?raw=true).
 
+Let's start by reading our data in. I'll be using the dplyr package later, so I'll add a `tbl_df` wrapper now.
+
+```{r read, echo = FALSE}
+library(dplyr)
+activity <- tbl_df(read.csv("./activity.csv",
+                            stringsAsFactors = FALSE,
+                            colClasses = c("integer", "Date", "integer")
+                            )
+                   )
+```
+
+Let's take a quick peek at our data to see what we're working with.
+
+```{r peek}
+activity
+```
+
+We can see that there's three variables:
+
+- **steps**: number of steps taken in a five-minute interval (missing values are coded as `NA`)
+
+- **date**: the date on which the measurement was taken
+
+- **interval**: identifier for the five-minute interval in which the measurement was taken
+
+I think it would look better if interval were in HHMM format. It will also plot better if we convert it to a factor. Let's make it happen.
+
+``` {r formatC}
+activity <- activity %>%
+    mutate(interval = formatC(interval, width = 4, format = "d", flag = "0"),
+           interval = factor(interval)
+           )
+activity
+```
+
+Finally, because aesthetics REALLY matters to me, I'm going to put steps as the last variable.
+
+```{r format}
+activity <- activity %>%
+    select(date, interval, steps)
+activity
+```
+
+With that out of the way, let's do some analysis!
 
 ## What is mean total number of steps taken per day?
 
